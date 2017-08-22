@@ -25,5 +25,22 @@ public class Activity {
             Circle.Circle();
         }
     }
+ 
+        
+    public static int checkParse(String s, String program) {
+            try {
+                return Integer.parseInt(s);
+            } catch(NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Please input a number");
+                if(program == "ThreeNumbers") {
+                    ThreeNumbers.ThreeNumbers();
+                }
+                if(program == "Circle"){
+                    Circle.Circle();
+                }
+                System.exit(0);
+                return 0;
+            }
+    }
     
 }

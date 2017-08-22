@@ -6,8 +6,10 @@ public class Circle {
     
     public static void Circle() {
         
-        //Dialog window for input
-        int r = Integer.parseInt(JOptionPane.showInputDialog(null, "Input a radius for the circle and hit enter: "));
+        //Dialog window for input and check to see if input is number
+        String input = JOptionPane.showInputDialog(null, "Input a radius for the circle and hit enter: ");
+        int check = Activity.checkParse(input, "Circle");
+        int r = check;
         
         //Manipulation of input for calculation
         DecimalFormat df = new DecimalFormat("#.#");
@@ -23,5 +25,6 @@ public class Circle {
                 "\nThe area of the circle is: " + area
         );
     }
+
     
 }
