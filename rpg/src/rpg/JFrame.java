@@ -1,12 +1,73 @@
 
 package rpg;
 
+import javax.swing.ImageIcon;
+
 
 public class JFrame extends javax.swing.JFrame {
     
+    //Creation of objects
     Player you = new Player(100, 50, 50, false);
-    Boss boss = new Boss(250, 100, 100, false);
+    Boss boss = new Boss(250, 100, 100, false, false);
 
+    //Boss mechanics
+    public void boss() {
+        //Setting action taken for boss
+        int action = (int) (Math.random() * 5) + 1;
+        
+        //Setting defending to false
+        boss.setDefending(false);
+        
+        //Checking to see if boss prepared attack
+        if(boss.getPrepared() == true) {
+            action = 1;
+        }
+        
+        //Potential actions for boss to take
+        switch (action) {
+            
+            case 1:
+                //Boss attacks you with a regualr or prepared attack
+                int bossDamage = boss.bossAttack(boss.getAttack(), boss.getPrepared(), you.getDefending());
+                
+                //Checking if player is defending
+                if(you.getDefending() == true) {
+                    you.takeDamage(bossDamage);
+                    PlayerHealthDisplay.setText(Integer.toString(you.getHealth()));
+                    Console.append("Boss attacks you, but you braced yourself! You take " + bossDamage + " damage!\n");
+                    boss.setPrepared(false);
+                    you.setDefending(false);
+                    return;
+                }
+                you.takeDamage(bossDamage);
+                PlayerHealthDisplay.setText(Integer.toString(you.getHealth()));
+                Console.append("Boss attacks you for: " + bossDamage + " damage!\n");
+                you.setDefending(false);
+                boss.setPrepared(false);
+                return;
+                
+            case 2: 
+                //Boss defends the next attack
+                boss.setDefending(true);
+                Console.append("Boss prepares to defend an attack!\n");
+                you.setDefending(false);
+                return;
+                
+            case 3: 
+                //Boss prepares a powerful attack
+                boss.setPrepared(true);
+                System.out.println("Boss becomes prepared");
+                Console.append("Boss prepares a powerful attack!\n");
+                you.setDefending(false);
+                return;
+                
+            case 4: 
+                //Boss roars at you
+                Console.append("Boss roars angrily!\n");
+                you.setDefending(false);
+                return;
+        }
+    }
     
     public static void main(String args []) {
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -32,7 +93,9 @@ public class JFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         AttackButton = new javax.swing.JButton();
         HealButton = new javax.swing.JButton();
@@ -51,28 +114,44 @@ public class JFrame extends javax.swing.JFrame {
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Player"));
 
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/player.png"))); // NOI18N
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 280, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(59, 59, 59)
+                .addComponent(jLabel2)
+                .addContainerGap(61, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(60, Short.MAX_VALUE)
+                .addComponent(jLabel2)
+                .addGap(58, 58, 58))
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Boss"));
+
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/boss.jpg"))); // NOI18N
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 281, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(65, Short.MAX_VALUE)
+                .addComponent(jLabel1)
+                .addGap(60, 60, 60))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 243, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(58, 58, 58)
+                .addComponent(jLabel1)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Menu"));
@@ -92,6 +171,11 @@ public class JFrame extends javax.swing.JFrame {
         });
 
         DefenseButton.setText("Defend");
+        DefenseButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                DefenseButtonActionPerformed(evt);
+            }
+        });
 
         PeeButton.setText("Piss Your Pants");
         PeeButton.addActionListener(new java.awt.event.ActionListener() {
@@ -155,11 +239,6 @@ public class JFrame extends javax.swing.JFrame {
 
         PlayerHealthDisplay.setEditable(false);
         PlayerHealthDisplay.setText(Integer.toString(you.getHealth()));
-        PlayerHealthDisplay.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                PlayerHealthDisplayActionPerformed(evt);
-            }
-        });
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -220,7 +299,7 @@ public class JFrame extends javax.swing.JFrame {
                         .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap(69, Short.MAX_VALUE))
+                .addContainerGap(116, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -229,7 +308,7 @@ public class JFrame extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -245,24 +324,36 @@ public class JFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void HealButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HealButtonActionPerformed
-        int heal = (int) (5 + Math.random()*5);
+        int heal = (int) (5 + Math.random()*6);
         you.setHealth(you.getHealth() + heal);
         PlayerHealthDisplay.setText(Integer.toString(you.getHealth()));
         Console.append("You heal for: " + heal + "\n");
+        boss();
     }//GEN-LAST:event_HealButtonActionPerformed
 
     private void PeeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PeeButtonActionPerformed
-        // TODO add your handling code here:
+        Console.append("You pee your pants...Nothing happens...\n");
+        boss();
     }//GEN-LAST:event_PeeButtonActionPerformed
 
     private void AttackButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AttackButtonActionPerformed
-        boss.takeDamage(10);
+        int playerDamage = you.attackAction(you.getAttack(), boss, boss.getDefending());
+        boss.takeDamage(playerDamage);
         BossHealthDisplay.setText(Integer.toString(boss.getHealth()));
+        if(boss.getDefending() == true) {
+            Console.append("Boss defends the blow and only takes " + playerDamage + " damage!\n");
+            boss();
+            return;
+        }
+        Console.append("You attack the boss and deal " + playerDamage + " damage!\n");
+        boss();
     }//GEN-LAST:event_AttackButtonActionPerformed
 
-    private void PlayerHealthDisplayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PlayerHealthDisplayActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_PlayerHealthDisplayActionPerformed
+    private void DefenseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DefenseButtonActionPerformed
+        you.setDefending(true);
+        Console.append("You prepare to defend yourself!\n");
+        boss();
+    }//GEN-LAST:event_DefenseButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -273,6 +364,8 @@ public class JFrame extends javax.swing.JFrame {
     private javax.swing.JButton HealButton;
     private javax.swing.JButton PeeButton;
     private javax.swing.JTextField PlayerHealthDisplay;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
