@@ -9,6 +9,19 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+/*
+Program Name: Homework2.java
+Programmer: Ivan Raffucci
+Date: 9/4/17
+Version 1.0
+Description: This program calculates payments made based on a specific 
+circumstance. The employee is payed 1 cent on the first day and each day the pay
+is doubled (ex 0.01, 0.02, 0.04, 0.08). The user is asked to inpupt a term length
+in years for the employment term of the employee. A table is created showing the
+day and the payment on that day. Once the term is complete, the total payment is
+indicated at the bottom of the table.
+ */
+
 public class Homework2 {
     
     
@@ -17,7 +30,7 @@ public class Homework2 {
         int term = 0;
         
         //While loop to catch any input that is not valid (see checkParse() method for more clarification of input validation)
-        while(term == 0) {
+        while(term == 0 || term > 100) {
             
             //Creation of dialog pane to accept the term length input from the user
             term = checkParse(JOptionPane.showInputDialog(null, "Input a valid term length"));
@@ -98,9 +111,14 @@ public class Homework2 {
         public static int checkParse(String s) {
             try {
                 //Success
-                return Integer.parseInt(s);
+                int result = Integer.parseInt(s);
+                if(result > 100) {
+                    JOptionPane.showMessageDialog(null, "Please input an integer less than 100");
+                } 
+                return result;
             } catch(NumberFormatException e) {
                 //Failure
+                JOptionPane.showMessageDialog(null, "Please input a valid integer value for term length");
                 return 0;
             }
     }
